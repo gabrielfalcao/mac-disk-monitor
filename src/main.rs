@@ -26,12 +26,13 @@ impl Event {
         let mut event = Event::empty();
         //\s*\(('(?P<bsd_name>[^']+)')?, DAVolumePath\s*=\s*(?P<path>'[^']+')\)
         let re =
-            Regex::new(r"^[*]{3}(\w+)\s*\(('([^']+)')?,\s*DAVolumePath\s*=\s*('([^']+)')?.*\)")
+            Regex::new(r"^[*]{3}(\w+)\s*\(('([^']+)')?,\s*DAVolumePath\s*=\s*('([^']+)')?\s*.*\)")
                 .unwrap();
         for cap in re.captures_iter(line) {
             event.set_name(&cap[1]);
             event.set_bsd_name(&cap[3]);
             event.set_path(&cap[5]);
+            event.set_kind("hfs");
         }
 
         event
@@ -58,8 +59,11 @@ impl Event {
     pub fn path(&self) -> Option<String> {
         self.volume_path.clone()
     }
+    pub fn set_kind(&mut self, kind: &str) {
+        self.volume_kind = Some(String::from(kind));
+    }
     pub fn kind(&self) -> Option<String> {
-        None
+        self.volume_kind.clone()
     }
 }
 
