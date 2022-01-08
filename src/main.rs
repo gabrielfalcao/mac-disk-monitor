@@ -26,13 +26,14 @@ impl Event {
         let mut event = Event::empty();
         //\s*\(('(?P<bsd_name>[^']+)')?, DAVolumePath\s*=\s*(?P<path>'[^']+')\)
         let re =
-            Regex::new(r"^[*]{3}(\w+)\s*\(('([^']+)')?,\s*DAVolumePath\s*=\s*('([^']+)')?\s*,\s*DAVolumeKind\s*=\s*('([^']+)')?\s*.*\)")
+            Regex::new(r"^[*]{3}(\w+)\s*\(('([^']+)')?,\s*DAVolumePath\s*=\s*('([^']+)')?\s*,\s*DAVolumeKind\s*=\s*('([^']+)')?\s*,\s*DAVolumeName\s*=\s*('([^']+)')?\s*.*\)")
                 .unwrap();
         for cap in re.captures_iter(line) {
             event.set_name(&cap[1]);
             event.set_bsd_name(&cap[3]);
             event.set_path(&cap[5]);
             event.set_kind(&cap[7]);
+            event.set_volume_name(&cap[9]);
         }
 
         event
@@ -65,8 +66,11 @@ impl Event {
     pub fn kind(&self) -> Option<String> {
         self.volume_kind.clone()
     }
+    pub fn set_volume_name(&mut self, name: &str) {
+        self.volume_name = Some(String::from(name));
+    }
     pub fn volume_name(&self) -> Option<String> {
-        Some(String::from("Time Machine Backups"))
+        self.volume_name.clone()
     }
 }
 
