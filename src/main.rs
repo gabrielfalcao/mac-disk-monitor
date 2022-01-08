@@ -43,7 +43,7 @@ impl Event {
         self.name = Some(String::from(name));
     }
     pub fn path(&self) -> Option<String> {
-        None
+        Some(String::from("/Volumes/Time%20Machine%20Backups/"))
     }
 }
 
