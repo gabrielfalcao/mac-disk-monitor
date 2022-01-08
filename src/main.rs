@@ -42,6 +42,9 @@ impl Event {
     pub fn set_name(&mut self, name: &str) {
         self.name = Some(String::from(name));
     }
+    pub fn path(&self) -> Option<String> {
+        None
+    }
 }
 
 #[cfg(test)]
@@ -50,11 +53,15 @@ mod tests {
     use k9::assert_equal;
 
     #[test]
-    fn test_parse_disk_appeared_without_volume_path() {
-        let line = String::from("***DiskAppeared ('disk3s1', DAVolumePath = '<null>', DAVolumeKind = 'msdos', DAVolumeName = 'EFI') Time=20220108-20:22:05.1454");
+    fn test_parse_disk_appeared_with_volume_path() {
+        let line = String::from("***DiskAppeared ('disk4', DAVolumePath = 'file:///Volumes/Time%20Machine%20Backups/', DAVolumeKind = 'hfs', DAVolumeName = 'Time Machine Backups') Time=20220108-20:22:05.1438");
         let disk_appeared = Event::from_line(line.as_str());
 
         assert_equal!(disk_appeared.name().as_str(), "DiskAppeared");
+        assert_equal!(
+            disk_appeared.path(),
+            Some(String::from("/Volumes/Time%20Machine%20Backups/"))
+        );
     }
 }
 
