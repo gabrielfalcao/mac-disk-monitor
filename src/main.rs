@@ -58,6 +58,9 @@ impl Event {
     pub fn path(&self) -> Option<String> {
         self.volume_path.clone()
     }
+    pub fn kind(&self) -> Option<String> {
+        None
+    }
 }
 
 #[cfg(test)]
@@ -76,6 +79,7 @@ mod tests {
             disk_appeared.path(),
             Some(String::from("file:///Volumes/my%20backups/"))
         );
+        assert_equal!(disk_appeared.kind(), Some(String::from("hfs")));
     }
 }
 
