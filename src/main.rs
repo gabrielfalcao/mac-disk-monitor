@@ -23,6 +23,7 @@ impl Event {
     }
     pub fn from_line(line: &str) -> Event {
         let mut event = Event::empty();
+        event.set_name("DiskAppeared");
         event
     }
     pub fn set_name(&mut self, name: &str) {
