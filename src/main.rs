@@ -70,10 +70,10 @@ mod tests {
 
         assert_equal!(disk_appeared.name().as_str(), "DiskAppeared");
         assert_equal!(disk_appeared.bsd_name(), Some(String::from("disk4")));
-        // assert_equal!(
-        //     disk_appeared.path(),
-        //     Some(String::from("/Volumes/Time%20Machine%20Backups/"))
-        // );
+        assert_equal!(
+            disk_appeared.path(),
+            Some(String::from("/Volumes/Time%20Machine%20Backups/"))
+        );
     }
 }
 
