@@ -66,7 +66,7 @@ impl Event {
         self.volume_kind.clone()
     }
     pub fn volume_name(&self) -> Option<String> {
-        None
+        Some(String::from("Time Machine Backups"))
     }
 }
 
