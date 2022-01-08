@@ -1,3 +1,30 @@
+# mac-disk-monitor
+
+Pet project to practice rust.
+
+The goal is to execute the command `diskutil activity` and parse every
+line in real-time, extracting structured event data.
+
+Developers should be able to subscribe to events and take action, for
+example emitting a notification if a specific disk is mounted.
+
+
+## Development
+
+This repo is in active development with best effort to classic
+Test-Driven Development, commits happen generaly in this order:
+
+- "TDD [red] - write a failing test that given an input expects an output"
+- "TDD [green] - write the smallest and/or simplest code to make the test pass, probably via hardcoding expected value"
+- "TDD [refactor] - write real code to make the test pass
+
+
+## Test Data
+
+<details>
+<summary>Click here to see the test data used as input for the "unit" tests</summary>
+
+```log
 ***Begin monitoring DiskArbitration activity
 ***DiskAppeared ('disk4', DAVolumePath = 'file:///Volumes/my%20backups/', DAVolumeKind = 'hfs', DAVolumeName = 'Time Machine Backups') Time=20220108-20:22:05.1438
 ***DiskAppeared ('disk3s2', DAVolumePath = '<null>', DAVolumeKind = '<null>', DAVolumeName = '<null>') Time=20220108-20:22:05.1453
@@ -69,3 +96,6 @@
 ***DiskMountApproval ('disk4', DAVolumePath = '<null>', DAVolumeKind = 'hfs', DAVolumeName = 'Time Machine Backups') Comment=Approving Time=20220108-20:26:49.4594
 ***DiskDescriptionChanged ('disk4', DAVolumePath = 'file:///Volumes/my%20backups/') Time=20220108-20:26:52.7814
 ***DAIdle (no DADiskRef) Time=20220108-20:26:52.7814
+
+```
+</details>

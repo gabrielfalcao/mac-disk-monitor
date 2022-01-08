@@ -67,14 +67,14 @@ mod tests {
 
     #[test]
     fn test_parse_disk_appeared_with_volume_path() {
-        let line = String::from("***DiskAppeared ('disk4', DAVolumePath = 'file:///Volumes/Time%20Machine%20Backups/', DAVolumeKind = 'hfs', DAVolumeName = 'Time Machine Backups') Time=20220108-20:22:05.1438");
+        let line = String::from("***DiskAppeared ('disk4', DAVolumePath = 'file:///Volumes/my%20backups/', DAVolumeKind = 'hfs', DAVolumeName = 'Time Machine Backups') Time=20220108-20:22:05.1438");
         let disk_appeared = Event::from_line(line.as_str());
 
         assert_equal!(disk_appeared.name().as_str(), "DiskAppeared");
         assert_equal!(disk_appeared.bsd_name(), Some(String::from("disk4")));
         assert_equal!(
             disk_appeared.path(),
-            Some(String::from("file:///Volumes/Time%20Machine%20Backups/"))
+            Some(String::from("file:///Volumes/my%20backups/"))
         );
     }
 }
