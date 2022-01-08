@@ -1,0 +1,13 @@
+[package]
+name = "mac-disk-monitor"
+version = "0.1.0"
+edition = "2021"
+authors = ["Gabriel Falcão <gabrielfalcao@protonmail.com>"]
+
+[dependencies]
+clap = { version = "2.33", features = ["wrap_help"] }
+regex = "1.5.4"
+
+[dev-dependencies]
+speculate = "0.1"
+k9 = "0.11.1"
