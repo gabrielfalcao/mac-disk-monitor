@@ -29,6 +29,7 @@ impl Event {
         for cap in re.captures_iter(line) {
             event.set_name(&cap[1]);
             event.set_bsd_name(&cap[3]);
+            event.set_path("/Volumes/Time%20Machine%20Backups/");
             //event.set_path(&cap[4]);
         }
 
