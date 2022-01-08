@@ -65,6 +65,9 @@ impl Event {
     pub fn kind(&self) -> Option<String> {
         self.volume_kind.clone()
     }
+    pub fn volume_name(&self) -> Option<String> {
+        None
+    }
 }
 
 #[cfg(test)]
@@ -84,6 +87,10 @@ mod tests {
             Some(String::from("file:///Volumes/my%20backups/"))
         );
         assert_equal!(disk_appeared.kind(), Some(String::from("hfs")));
+        assert_equal!(
+            disk_appeared.volume_name(),
+            Some(String::from("Time Machine Backups"))
+        );
     }
 }
 
