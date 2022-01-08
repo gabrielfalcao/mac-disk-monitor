@@ -25,12 +25,13 @@ impl Event {
     pub fn from_line(line: &str) -> Event {
         let mut event = Event::empty();
         //\s*\(('(?P<bsd_name>[^']+)')?, DAVolumePath\s*=\s*(?P<path>'[^']+')\)
-        let re = Regex::new(r"^[*]{3}(\w+)\s*\(('([^']+)')?,\s*.*\)").unwrap();
+        let re =
+            Regex::new(r"^[*]{3}(\w+)\s*\(('([^']+)')?,\s*DAVolumePath\s*=\s*('([^']+)')?.*\)")
+                .unwrap();
         for cap in re.captures_iter(line) {
             event.set_name(&cap[1]);
             event.set_bsd_name(&cap[3]);
-            event.set_path("/Volumes/Time%20Machine%20Backups/");
-            //event.set_path(&cap[4]);
+            event.set_path(&cap[5]);
         }
 
         event
@@ -73,7 +74,7 @@ mod tests {
         assert_equal!(disk_appeared.bsd_name(), Some(String::from("disk4")));
         assert_equal!(
             disk_appeared.path(),
-            Some(String::from("/Volumes/Time%20Machine%20Backups/"))
+            Some(String::from("file:///Volumes/Time%20Machine%20Backups/"))
         );
     }
 }
