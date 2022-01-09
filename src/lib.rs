@@ -274,6 +274,13 @@ mod tests {
         assert_equal!(event.bsd_name(), Some(String::from("disk3s1")));
         assert_equal!(event.time_string().as_str(), "20220108-20:22:35.8607");
     }
-    // TODO
-    // ***DAIdle (no DADiskRef) Time=20220108-20:22:29.6774
+    #[test]
+    fn test_parse_disk_activity_idle() {
+        let line = String::from("***DAIdle (no DADiskRef) Time=20220108-20:22:29.6774");
+        let event = Event::from_line(line.as_str());
+
+        assert_equal!(event.name().as_str(), "DAIdle");
+        assert_equal!(event.bsd_name(), Some(String::from("no DADiskRef")));
+        assert_equal!(event.time_string().as_str(), "20220108-20:22:29.6774");
+    }
 }
