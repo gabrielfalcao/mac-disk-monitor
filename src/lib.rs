@@ -3,7 +3,7 @@
 use regex::Regex;
 
 pub struct Event {
-    name: Option<String>,
+    name: String,
     time: String,
     bsd_name: Option<String>,
     volume_path: Option<String>,
@@ -14,7 +14,7 @@ pub struct Event {
 impl Event {
     pub fn empty() -> Event {
         Event {
-            name: None,
+            name: String::new(),
             time: String::new(),
             bsd_name: None,
             volume_path: None,
@@ -60,14 +60,11 @@ impl Event {
         event
     }
     pub fn name(&self) -> String {
-        match &self.name {
-            Some(name) => name.clone(),
-            None => String::new(),
-        }
+        self.name.clone()
     }
 
     pub fn set_name(&mut self, name: &str) {
-        self.name = Some(String::from(name));
+        self.name = String::from(name)
     }
     pub fn set_bsd_name(&mut self, bsd_name: &str) {
         self.bsd_name = Some(String::from(bsd_name));
@@ -222,4 +219,21 @@ mod tests {
             "20220108-20:22:05.1457"
         );
     }
+    #[test]
+    fn test_parse_disk_disappeared() {
+        let line = String::from("***DiskDisappeared ('disk3s1', DAVolumePath = '<null>', DAVolumeKind = 'msdos', DAVolumeName = 'EFI') Time=20220108-20:22:29.6773");
+        let event = Event::from_line(line.as_str());
+
+        assert_equal!(event.name().as_str(), "DiskDisappeared");
+        assert_equal!(event.bsd_name(), Some(String::from("disk3s1")));
+        assert_equal!(event.path(), None);
+        assert_equal!(event.kind(), Some(String::from("msdos")));
+        assert_equal!(event.volume_name(), Some(String::from("EFI")));
+        assert_equal!(event.time_string().as_str(), "20220108-20:22:29.6773");
+    }
+    // TODO
+    // ***DAIdle (no DADiskRef) Time=20220108-20:22:29.6774
+    // ***DiskPeek ('disk3s1') Time=20220108-20:22:35.8607
+    // ***DiskAppeared ('disk3s1', DAVolumePath = '<null>', DAVolumeKind = 'msdos', DAVolumeName = 'EFI') Time=20220108-20:22:35.8673
+    // ***DiskMountApproval ('disk3s1', DAVolumePath = '<null>', DAVolumeKind = 'msdos', DAVolumeName = 'EFI') Comment=Approving Time=20220108-20:22:35.8686
 }
