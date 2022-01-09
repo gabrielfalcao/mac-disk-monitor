@@ -17,3 +17,9 @@ k9 = "0.11.1"
 [lib]
 name = "mac_disk_monitor"
 path = "src/lib.rs"
+
+
+[[bin]]
+name = "mac-disk-monitor"
+path = "src/cli.rs"
+bench = false
