@@ -35,7 +35,7 @@ pub fn stream_events(
     let (sender, receiver) = channel();
 
     let handle = thread::spawn(move || {
-        let event = Event::empty();
+        let event = Event::from_line("***DiskDescriptionChanged ('disk4', DAVolumePath = 'file:///Volumes/my%20backups/') Time=20220108-20:26:52.7814");
         thread::sleep(Duration::from_secs(2));
         sender.send(Some(event)).unwrap();
         match action.recv_timeout(Duration::from_secs(1)) {
