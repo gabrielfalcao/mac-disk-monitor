@@ -72,9 +72,8 @@ pub fn stream_events_with_command(
                         eprintln!("<noop>");
                     }
                 },
-                Err(e) => {
-                    eprintln!("<thread> {}", e);
-                    return child.kill().map_err(|e| Error::from(e));
+                Err(_e) => {
+                    //sender.send(None).unwrap_or(());
                 }
             }
             let mut outbuf: Vec<u8> = Vec::new();

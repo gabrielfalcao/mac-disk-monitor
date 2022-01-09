@@ -7,21 +7,21 @@ fn main() {
     let (thread, receiver) = stream_events(receiver);
 
     loop {
-        match receiver.recv_timeout(Duration::from_millis(3145)) {
+        match receiver.recv_timeout(Duration::from_millis(1500)) {
             Ok(event) => match event {
                 Some(event) => {
-                    println!("{}", event.to_json());
+                    println!("{}", event.name());
                 }
                 None => {
                     action.send(Action::Stop).unwrap();
                 }
             },
             Err(e) => {
-                action.send(Action::Stop).unwrap();
                 eprintln!("Error: {}", e);
+                action.send(Action::Stop).unwrap();
+
+                break;
             }
         }
     }
-    thread.join().unwrap().unwrap();
-    println!("done!")
 }

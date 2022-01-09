@@ -14,14 +14,20 @@ fn main() {
     let (thread, receiver) = stream_events(receiver);
 
     loop {
-        match receiver.recv_timeout(Duration::from_secs(1)) {
+        match receiver.recv_timeout(Duration::from_millis(3145)) {
             Ok(event) => match event {
                 Some(event) => {
                     println!("{}", event.to_json());
                 }
-                None => {}
+                None => {
+                    action.send(Action::Stop).unwrap();
+                }
             },
-            Err(_) => {}
+            Err(e) => {
+                action.send(Action::Stop).unwrap_or(());
+                eprintln!("Error: {}", e);
+                break;
+            }
         }
     }
 }
