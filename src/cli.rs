@@ -24,7 +24,9 @@ fn main() {
                 }
             },
             Err(e) => {
-                eprintln!("warning: {}", e);
+                if !e.to_string().eq("timed out waiting on channel") {
+                    eprintln!("Error: {}", e);
+                }
             }
         }
     }
