@@ -70,7 +70,6 @@ pub fn stream_events_with_command(
                     match action.recv_timeout(Duration::from_millis(100)) {
                         Ok(action) => match action {
                             Action::Stop => {
-                                sender.send(None).unwrap_or(());
                                 return child.kill().map_err(|e| Error::from(e));
                             }
                             Action::Noop => continue,
