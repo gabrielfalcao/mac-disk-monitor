@@ -107,6 +107,21 @@ mod tests {
             "20220108-20:22:05.1438"
         );
     }
+    #[test]
+    fn test_parse_disk_appeared_without_volume_path_kind_and_name() {
+        let line = String::from("***DiskAppeared ('disk3s2', DAVolumePath = '<null>', DAVolumeKind = '<null>', DAVolumeName = '<null>') Time=20220108-20:22:05.1453");
+        let disk_appeared = Event::from_line(line.as_str());
+
+        assert_equal!(disk_appeared.name().as_str(), "DiskAppeared");
+        assert_equal!(disk_appeared.bsd_name(), Some(String::from("disk3s2")));
+        assert_equal!(disk_appeared.path(), None);
+        assert_equal!(disk_appeared.kind(), None);
+        assert_equal!(disk_appeared.volume_name(), None);
+        assert_equal!(
+            disk_appeared.time_string().as_str(),
+            "20220108-20:22:05.1453"
+        );
+    }
 }
 
 fn main() {}
