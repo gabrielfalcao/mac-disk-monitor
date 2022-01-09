@@ -1,4 +1,3 @@
-#![allow(unused)]
 use crate::event::Event;
 use std::io::BufRead;
 use std::io::BufReader;

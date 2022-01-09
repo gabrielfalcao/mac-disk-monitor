@@ -1,17 +1,16 @@
-#![allow(unused)]
 extern crate clap;
-use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
-use mac_disk_monitor::event::Event;
+use clap::{App};
+
 use mac_disk_monitor::std::*;
-use std::sync::mpsc::{channel, Receiver};
+use std::sync::mpsc::{channel};
 use std::time::Duration;
 
 fn main() {
     let app = App::new("mac-disk-monitor");
-    let matches = app.get_matches();
+    let _matches = app.get_matches();
 
     let (action, receiver) = channel();
-    let (thread, receiver) = stream_events(receiver);
+    let (_thread, receiver) = stream_events(receiver);
 
     loop {
         match receiver.recv_timeout(Duration::from_millis(3145)) {

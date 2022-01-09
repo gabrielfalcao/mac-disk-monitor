@@ -1,5 +1,3 @@
-#![allow(unused_variables)]
-#![allow(dead_code)]
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
