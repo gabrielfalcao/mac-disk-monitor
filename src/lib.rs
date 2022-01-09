@@ -265,8 +265,15 @@ mod tests {
         assert_equal!(event.comment(), Some(String::from("Approving")));
         assert_equal!(event.time_string().as_str(), "20220108-20:22:35.8686");
     }
+    #[test]
+    fn test_parse_disk_peek() {
+        let line = String::from("***DiskPeek ('disk3s1') Time=20220108-20:22:35.8607");
+        let event = Event::from_line(line.as_str());
+
+        assert_equal!(event.name().as_str(), "DiskPeek");
+        assert_equal!(event.bsd_name(), Some(String::from("disk3s1")));
+        assert_equal!(event.time_string().as_str(), "20220108-20:22:35.8607");
+    }
     // TODO
     // ***DAIdle (no DADiskRef) Time=20220108-20:22:29.6774
-    // ***DiskPeek ('disk3s1') Time=20220108-20:22:35.8607
-    // ***DiskMountApproval ('disk3s1', DAVolumePath = '<null>', DAVolumeKind = 'msdos', DAVolumeName = 'EFI') Comment=Approving Time=20220108-20:22:35.8686
 }
