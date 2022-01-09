@@ -62,12 +62,20 @@ pub fn stream_events_with_command(
 
         loop {
             match action.recv_timeout(Duration::from_millis(100)) {
-                Ok(action) => {
-                    if action == Action::Stop {
-                        break;
+                Ok(action) => match action {
+                    Action::Stop => {
+                        eprintln!("<stop>");
+                        sender.send(None).unwrap_or(());
+                        return child.kill().map_err(|e| Error::from(e));
                     }
+                    Action::Noop => {
+                        eprintln!("<noop>");
+                    }
+                },
+                Err(e) => {
+                    eprintln!("<thread> {}", e);
+                    return child.kill().map_err(|e| Error::from(e));
                 }
-                Err(_err) => {}
             }
             let mut outbuf: Vec<u8> = Vec::new();
             if let Ok(_bytes_read) = stdout_reader.read_until(b'\n', &mut outbuf) {
@@ -81,7 +89,10 @@ pub fn stream_events_with_command(
             match child.try_wait() {
                 Ok(Some(_)) => break,
                 Ok(None) => continue,
-                Err(e) => panic!("failed to read output of diskutil activity: {}", e),
+                Err(e) => {
+                    eprintln!("failed to read output of diskutil activity: {}", e);
+                    break;
+                }
             }
         }
         sender.send(None).unwrap();
