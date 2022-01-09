@@ -9,6 +9,7 @@ pub struct Event {
     volume_path: Option<String>,
     volume_kind: Option<String>,
     volume_name: Option<String>,
+    comment: Option<String>,
 }
 
 impl Event {
@@ -20,17 +21,24 @@ impl Event {
             volume_path: None,
             volume_kind: None,
             volume_name: None,
+            comment: None,
         }
     }
     pub fn from_line(line: &str) -> Event {
         let mut event = Event::empty();
         //\s*\(('(?P<bsd_name>[^']+)')?, DAVolumePath\s*=\s*(?P<path>'[^']+')\)
         match extract_base_metadata(line) {
-            Some((name, bsd_name, time)) => {
+            Some((name, bsd_name, comment, time)) => {
                 event.set_name(name.as_str());
                 match bsd_name {
                     Some(bsd_name) => {
                         event.set_bsd_name(bsd_name.as_str());
+                    }
+                    None => {}
+                }
+                match comment {
+                    Some(comment) => {
+                        event.set_comment(comment.as_str());
                     }
                     None => {}
                 }
@@ -72,6 +80,12 @@ impl Event {
     pub fn bsd_name(&self) -> Option<String> {
         self.bsd_name.clone()
     }
+    pub fn set_comment(&mut self, comment: &str) {
+        self.comment = Some(String::from(comment));
+    }
+    pub fn comment(&self) -> Option<String> {
+        self.comment.clone()
+    }
     pub fn set_path(&mut self, path: &str) {
         self.volume_path = if !path.eq("<null>") {
             Some(String::from(path))
@@ -110,8 +124,11 @@ impl Event {
     }
 }
 
-pub fn extract_base_metadata(line: &str) -> Option<(String, Option<String>, String)> {
-    let re = Regex::new(r"^[*]{3}(\w+)\s*\('?([^,']+)'?.*?\)\s*Time=(\S+)").unwrap();
+pub fn extract_base_metadata(
+    line: &str,
+) -> Option<(String, Option<String>, Option<String>, String)> {
+    let re =
+        Regex::new(r"^[*]{3}(\w+)\s*\('?([^,']+)'?.*?\)\s*(Comment=(\S+))?\s*Time=(\S+)").unwrap();
     match re.captures(line) {
         Some(caps) => {
             let name = caps.get(1).unwrap().as_str().to_string();
@@ -121,8 +138,12 @@ pub fn extract_base_metadata(line: &str) -> Option<(String, Option<String>, Stri
             } else {
                 Some(bsd_name)
             };
-            let time = caps.get(3).unwrap().as_str().to_string();
-            Some((name, bsd_name, time))
+            let comment = match caps.get(4) {
+                Some(m) => Some(m.as_str().to_string()),
+                None => None,
+            };
+            let time = caps.get(5).unwrap().as_str().to_string();
+            Some((name, bsd_name, comment, time))
         }
         None => None,
     }
@@ -241,6 +262,7 @@ mod tests {
         assert_equal!(event.path(), None);
         assert_equal!(event.kind(), Some(String::from("msdos")));
         assert_equal!(event.volume_name(), Some(String::from("EFI")));
+        assert_equal!(event.comment(), Some(String::from("Approving")));
         assert_equal!(event.time_string().as_str(), "20220108-20:22:35.8686");
     }
     // TODO
