@@ -72,6 +72,9 @@ impl Event {
     pub fn volume_name(&self) -> Option<String> {
         self.volume_name.clone()
     }
+    pub fn time_string(&self) -> Option<String> {
+        None
+    }
 }
 
 #[cfg(test)]
@@ -94,6 +97,10 @@ mod tests {
         assert_equal!(
             disk_appeared.volume_name(),
             Some(String::from("Time Machine Backups"))
+        );
+        assert_equal!(
+            disk_appeared.time_string(),
+            Some(String::from("20220108-20:22:05.1438"))
         );
     }
 }
