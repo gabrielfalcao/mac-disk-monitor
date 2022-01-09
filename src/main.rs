@@ -28,7 +28,12 @@ impl Event {
         match extract_base_metadata(line) {
             Some((name, bsd_name, time)) => {
                 event.set_name(name.as_str());
-                event.set_bsd_name(bsd_name.as_str());
+                match bsd_name {
+                    Some(bsd_name) => {
+                        event.set_bsd_name(bsd_name.as_str());
+                    }
+                    None => {}
+                }
                 event.set_time_string(time.as_str());
             }
             None => {}
@@ -108,13 +113,13 @@ impl Event {
     }
 }
 
-pub fn extract_base_metadata(line: &str) -> Option<(String, String, String)> {
-    let re = Regex::new(r"^[*]{3}(\w+)\s*\(('([^']+)')?.*?\)\s*Time=(\S+)").unwrap();
+pub fn extract_base_metadata(line: &str) -> Option<(String, Option<String>, String)> {
+    let re = Regex::new(r"^[*]{3}(\w+)\s*\('?([^,']+)'?.*?\)\s*Time=(\S+)").unwrap();
     match re.captures(line) {
         Some(caps) => {
             let name = caps.get(1).unwrap().as_str().to_string();
-            let bsd_name = caps.get(3).unwrap().as_str().to_string();
-            let time = caps.get(4).unwrap().as_str().to_string();
+            let bsd_name = Some(caps.get(2).unwrap().as_str().to_string());
+            let time = caps.get(3).unwrap().as_str().to_string();
             Some((name, bsd_name, time))
         }
         None => None,
@@ -192,6 +197,24 @@ mod tests {
         assert_equal!(
             disk_appeared.time_string().as_str(),
             "20220108-20:22:05.1453"
+        );
+    }
+    #[test]
+    fn test_parse_disk_appeared_without_bsd_name() {
+        let line = String::from("***DiskAppeared ((no BSD name), DAVolumePath = 'file:///System/Volumes/Data/home/', DAVolumeKind = 'autofs', DAVolumeName = '<null>') Time=20220108-20:22:05.1457");
+        let disk_appeared = Event::from_line(line.as_str());
+
+        assert_equal!(disk_appeared.name().as_str(), "DiskAppeared");
+        assert_equal!(disk_appeared.bsd_name(), None);
+        assert_equal!(
+            disk_appeared.path(),
+            Some(String::from("file:///System/Volumes/Data/home/"))
+        );
+        assert_equal!(disk_appeared.kind(), Some(String::from("autofs")));
+        assert_equal!(disk_appeared.volume_name(), None);
+        assert_equal!(
+            disk_appeared.time_string().as_str(),
+            "20220108-20:22:05.1457"
         );
     }
 }
