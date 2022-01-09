@@ -231,9 +231,20 @@ mod tests {
         assert_equal!(event.volume_name(), Some(String::from("EFI")));
         assert_equal!(event.time_string().as_str(), "20220108-20:22:29.6773");
     }
+    #[test]
+    fn test_parse_disk_mount_approval() {
+        let line = String::from("***DiskMountApproval ('disk3s1', DAVolumePath = '<null>', DAVolumeKind = 'msdos', DAVolumeName = 'EFI') Comment=Approving Time=20220108-20:22:35.8686");
+        let event = Event::from_line(line.as_str());
+
+        assert_equal!(event.name().as_str(), "DiskMountApproval");
+        assert_equal!(event.bsd_name(), Some(String::from("disk3s1")));
+        assert_equal!(event.path(), None);
+        assert_equal!(event.kind(), Some(String::from("msdos")));
+        assert_equal!(event.volume_name(), Some(String::from("EFI")));
+        assert_equal!(event.time_string().as_str(), "20220108-20:22:35.8686");
+    }
     // TODO
     // ***DAIdle (no DADiskRef) Time=20220108-20:22:29.6774
     // ***DiskPeek ('disk3s1') Time=20220108-20:22:35.8607
-    // ***DiskAppeared ('disk3s1', DAVolumePath = '<null>', DAVolumeKind = 'msdos', DAVolumeName = 'EFI') Time=20220108-20:22:35.8673
     // ***DiskMountApproval ('disk3s1', DAVolumePath = '<null>', DAVolumeKind = 'msdos', DAVolumeName = 'EFI') Comment=Approving Time=20220108-20:22:35.8686
 }
