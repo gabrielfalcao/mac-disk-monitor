@@ -1,5 +1,8 @@
 # mac-disk-monitor
 
+[![CI](https://github.com/gabrielfalcao/mac-disk-monitor/actions/workflows/rust.yml/badge.svg)](https://github.com/gabrielfalcao/mac-disk-monitor/actions/workflows/rust.yml)
+[![codecov](https://codecov.io/gh/gabrielfalcao/mac-disk-monitor/branch/main/graph/badge.svg?token=WjeDQXuLmv)](https://codecov.io/gh/gabrielfalcao/mac-disk-monitor)
+
 Pet project to practice rust.
 
 The goal is to execute the command `diskutil activity` and parse every
