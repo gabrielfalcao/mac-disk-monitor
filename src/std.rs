@@ -90,3 +90,12 @@ pub fn stream_events_with_command(
 
     (handle, receiver)
 }
+
+pub fn stream_events(
+    action: Receiver<Action>,
+) -> (
+    thread::JoinHandle<Result<(), Error>>,
+    Receiver<Option<Event>>,
+) {
+    stream_events_with_command("/usr/sbin/diskutil", vec!["activity"], action)
+}

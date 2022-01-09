@@ -3,6 +3,38 @@
 [![CI](https://github.com/gabrielfalcao/mac-disk-monitor/actions/workflows/rust.yml/badge.svg)](https://github.com/gabrielfalcao/mac-disk-monitor/actions/workflows/rust.yml)
 [![codecov](https://codecov.io/gh/gabrielfalcao/mac-disk-monitor/branch/main/graph/badge.svg?token=WjeDQXuLmv)](https://codecov.io/gh/gabrielfalcao/mac-disk-monitor)
 
+## Usage
+
+```rust
+use mac_disk_monitor::stream_events;
+use std::sync::mpsc::channel;
+use std::time::Duration;
+
+fn main() {
+    let (action, receiver) = channel();
+    let (thread, receiver) = stream_events(
+        "/usr/sbin/diskutil",
+        vec!["activity"],
+        receiver
+    );
+
+    loop {
+        match receiver.recv_timeout(Duration::from_secs(1)) {
+            Ok(event) => match event {
+                Some(event) => {
+                    println!("{}", event.to_json());
+                }
+                None => {}
+            },
+            Err(e) => {
+                eprintln!("Error: {}", e);
+            }
+        }
+    }
+}
+```
+
+## Context
 Pet project to practice rust.
 
 The goal is to execute the command `diskutil activity` and parse every
@@ -12,7 +44,7 @@ Developers should be able to subscribe to events and take action, for
 example emitting a notification if a specific disk is mounted.
 
 
-## Development
+### Development
 
 This repo is in active development with best effort to classic
 Test-Driven Development, commits happen generaly in this order:
@@ -22,7 +54,7 @@ Test-Driven Development, commits happen generaly in this order:
 - "TDD [refactor] - write real code to make the test pass
 
 
-## Test Data
+### Test Data
 
 <details>
 <summary>Click here to see the test data used as input for the "unit" tests</summary>
