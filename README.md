@@ -31,9 +31,10 @@ fn main() {
 ```
 
 ## Context
-Pet project to practice rust.
 
-The goal is to execute the command `diskutil activity` and parse every
+This started as a pet project to practice rust.
+
+It executes the command `diskutil activity` in a thread and parses every stdout
 line in real-time, extracting structured event data.
 
 Developers should be able to subscribe to events and take action, for
@@ -49,6 +50,7 @@ Test-Driven Development, commits happen generaly in this order:
 - "TDD [green] - write the smallest and/or simplest code to make the test pass, probably via hardcoding expected value"
 - "TDD [refactor] - write real code to make the test pass
 
+Other than that, all other commits kind of follow [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Test Data
 
