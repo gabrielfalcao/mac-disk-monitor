@@ -2,6 +2,7 @@
 #![allow(dead_code)]
 use regex::Regex;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Event {
     name: String,
     time: String,
