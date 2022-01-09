@@ -56,19 +56,31 @@ impl Event {
         self.bsd_name.clone()
     }
     pub fn set_path(&mut self, path: &str) {
-        self.volume_path = Some(String::from(path));
+        self.volume_path = if !path.eq("<null>") {
+            Some(String::from(path))
+        } else {
+            None
+        };
     }
     pub fn path(&self) -> Option<String> {
         self.volume_path.clone()
     }
     pub fn set_kind(&mut self, kind: &str) {
-        self.volume_kind = Some(String::from(kind));
+        self.volume_kind = if !kind.eq("<null>") {
+            Some(String::from(kind))
+        } else {
+            None
+        };
     }
     pub fn kind(&self) -> Option<String> {
         self.volume_kind.clone()
     }
     pub fn set_volume_name(&mut self, name: &str) {
-        self.volume_name = Some(String::from(name));
+        self.volume_name = if !name.eq("<null>") {
+            Some(String::from(name))
+        } else {
+            None
+        };
     }
     pub fn volume_name(&self) -> Option<String> {
         self.volume_name.clone()
