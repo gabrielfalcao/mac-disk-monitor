@@ -25,16 +25,21 @@ impl Event {
     pub fn from_line(line: &str) -> Event {
         let mut event = Event::empty();
         //\s*\(('(?P<bsd_name>[^']+)')?, DAVolumePath\s*=\s*(?P<path>'[^']+')\)
+        match extract_base_metadata(line) {
+            Some((name, bsd_name, time)) => {
+                event.set_name(name.as_str());
+                event.set_bsd_name(bsd_name.as_str());
+                event.set_time_string(time.as_str());
+            }
+            None => {}
+        }
         let re =
             Regex::new(r"^[*]{3}(\w+)\s*\(('([^']+)')?,\s*DAVolumePath\s*=\s*('([^']+)')?\s*,\s*DAVolumeKind\s*=\s*('([^']+)')?\s*,\s*DAVolumeName\s*=\s*('([^']+)')?\s*\)\s*Time=(\S+)")
                 .unwrap();
         for cap in re.captures_iter(line) {
-            event.set_name(&cap[1]);
-            event.set_bsd_name(&cap[3]);
             event.set_path(&cap[5]);
             event.set_kind(&cap[7]);
             event.set_volume_name(&cap[9]);
-            event.set_time_string(&cap[10]);
         }
 
         event
@@ -93,6 +98,18 @@ impl Event {
     }
 }
 
+pub fn extract_base_metadata(line: &str) -> Option<(String, String, String)> {
+    let re = Regex::new(r"^[*]{3}(\w+)\s*\(('([^']+)')?.*?\)\s*Time=(\S+)").unwrap();
+    match re.captures(line) {
+        Some(caps) => {
+            let name = caps.get(1).unwrap().as_str().to_string();
+            let bsd_name = caps.get(3).unwrap().as_str().to_string();
+            let time = caps.get(4).unwrap().as_str().to_string();
+            Some((name, bsd_name, time))
+        }
+        None => None,
+    }
+}
 #[cfg(test)]
 mod tests {
     use super::Event;
