@@ -33,13 +33,23 @@ impl Event {
             }
             None => {}
         }
-        let re =
-            Regex::new(r"^[*]{3}(\w+)\s*\(('([^']+)')?,\s*DAVolumePath\s*=\s*('([^']+)')?\s*,\s*DAVolumeKind\s*=\s*('([^']+)')?\s*,\s*DAVolumeName\s*=\s*('([^']+)')?\s*\)\s*Time=(\S+)")
-                .unwrap();
-        for cap in re.captures_iter(line) {
-            event.set_path(&cap[5]);
-            event.set_kind(&cap[7]);
-            event.set_volume_name(&cap[9]);
+        match extract_volume_path(line) {
+            Some(path) => {
+                event.set_path(path.as_str());
+            }
+            None => {}
+        }
+        match extract_volume_kind(line) {
+            Some(kind) => {
+                event.set_kind(kind.as_str());
+            }
+            None => {}
+        }
+        match extract_volume_name(line) {
+            Some(name) => {
+                event.set_volume_name(name.as_str());
+            }
+            None => {}
         }
 
         event
@@ -106,6 +116,39 @@ pub fn extract_base_metadata(line: &str) -> Option<(String, String, String)> {
             let bsd_name = caps.get(3).unwrap().as_str().to_string();
             let time = caps.get(4).unwrap().as_str().to_string();
             Some((name, bsd_name, time))
+        }
+        None => None,
+    }
+}
+pub fn extract_volume_path(line: &str) -> Option<String> {
+    let re = Regex::new(r"DAVolumePath\s*=\s*('([^']+)')").unwrap();
+
+    match re.captures(line) {
+        Some(caps) => {
+            let name = caps.get(2).unwrap().as_str().to_string();
+            Some(name)
+        }
+        None => None,
+    }
+}
+pub fn extract_volume_kind(line: &str) -> Option<String> {
+    let re = Regex::new(r"DAVolumeKind\s*=\s*('([^']+)')").unwrap();
+
+    match re.captures(line) {
+        Some(caps) => {
+            let name = caps.get(2).unwrap().as_str().to_string();
+            Some(name)
+        }
+        None => None,
+    }
+}
+pub fn extract_volume_name(line: &str) -> Option<String> {
+    let re = Regex::new(r"DAVolumeName\s*=\s*('([^']+)')").unwrap();
+
+    match re.captures(line) {
+        Some(caps) => {
+            let name = caps.get(2).unwrap().as_str().to_string();
+            Some(name)
         }
         None => None,
     }
