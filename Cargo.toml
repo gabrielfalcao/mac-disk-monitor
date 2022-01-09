@@ -11,3 +11,7 @@ regex = "1.5.4"
 [dev-dependencies]
 speculate = "0.1"
 k9 = "0.11.1"
+
+[lib]
+name = "mac_disk_monitor"
+path = "src/lib.rs"

@@ -223,5 +223,3 @@ mod tests {
         );
     }
 }
-
-fn main() {}
