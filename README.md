@@ -5,6 +5,8 @@
 
 ## Usage
 
+Run the code below, then try plugging a USB dongle or opening a DMG file.
+
 ```rust
 use mac_disk_monitor::stream_events;
 use std::sync::mpsc::channel;
