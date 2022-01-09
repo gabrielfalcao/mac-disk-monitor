@@ -26,7 +26,7 @@ impl Event {
         let mut event = Event::empty();
         //\s*\(('(?P<bsd_name>[^']+)')?, DAVolumePath\s*=\s*(?P<path>'[^']+')\)
         let re =
-            Regex::new(r"^[*]{3}(\w+)\s*\(('([^']+)')?,\s*DAVolumePath\s*=\s*('([^']+)')?\s*,\s*DAVolumeKind\s*=\s*('([^']+)')?\s*,\s*DAVolumeName\s*=\s*('([^']+)')?\s*.*\)")
+            Regex::new(r"^[*]{3}(\w+)\s*\(('([^']+)')?,\s*DAVolumePath\s*=\s*('([^']+)')?\s*,\s*DAVolumeKind\s*=\s*('([^']+)')?\s*,\s*DAVolumeName\s*=\s*('([^']+)')?\s*\)\s*Time=(\S+)")
                 .unwrap();
         for cap in re.captures_iter(line) {
             event.set_name(&cap[1]);
@@ -34,7 +34,7 @@ impl Event {
             event.set_path(&cap[5]);
             event.set_kind(&cap[7]);
             event.set_volume_name(&cap[9]);
-            event.set_time_string("20220108-20:22:05.1438");
+            event.set_time_string(&cap[10]);
         }
 
         event
