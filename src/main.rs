@@ -118,7 +118,12 @@ pub fn extract_base_metadata(line: &str) -> Option<(String, Option<String>, Stri
     match re.captures(line) {
         Some(caps) => {
             let name = caps.get(1).unwrap().as_str().to_string();
-            let bsd_name = Some(caps.get(2).unwrap().as_str().to_string());
+            let bsd_name = caps.get(2).unwrap().as_str().to_string();
+            let bsd_name = if bsd_name.eq("(no BSD name)") {
+                None
+            } else {
+                Some(bsd_name)
+            };
             let time = caps.get(3).unwrap().as_str().to_string();
             Some((name, bsd_name, time))
         }
