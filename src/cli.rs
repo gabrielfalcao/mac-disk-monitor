@@ -1,3 +1,4 @@
+#![allow(unused)]
 extern crate clap;
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 use mac_disk_monitor::event::Event;
@@ -15,9 +16,12 @@ fn main() {
 
     loop {
         match receiver.recv_timeout(Duration::from_secs(1)) {
-            Ok(event) => {
-                println!("{:?}", event);
-            }
+            Ok(event) => match event {
+                Some(event) => {
+                    println!("{}", event.to_json());
+                }
+                None => {}
+            },
             Err(_) => {}
         }
     }

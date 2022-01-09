@@ -1,8 +1,9 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 use regex::Regex;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Event {
     name: String,
     time: String,
@@ -68,6 +69,25 @@ impl Event {
 
         event
     }
+    pub fn to_yaml(&self) -> String
+    where
+        Self: Serialize,
+    {
+        match serde_yaml::to_string(&self) {
+            Ok(val) => val,
+            Err(e) => format!("{{\"error\": {:?}}}", e),
+        }
+    }
+    pub fn to_json(&self) -> String
+    where
+        Self: Serialize,
+    {
+        match serde_json::to_string(&self) {
+            Ok(val) => val,
+            Err(e) => format!("{}", e),
+        }
+    }
+
     pub fn name(&self) -> String {
         self.name.clone()
     }
