@@ -1,7 +1,7 @@
 #![allow(unused)]
 use k9::assert_equal;
 use mac_disk_monitor::event::Event;
-use mac_disk_monitor::std::{stream_events, Action};
+use mac_disk_monitor::std::*;
 use std::sync::mpsc::{channel, Receiver};
 use std::thread;
 use std::time::Duration;
@@ -9,7 +9,8 @@ use std::time::Duration;
 #[test]
 fn test_disk_activity() {
     let (action_sender, action_receiver) = channel();
-    let (thread, receiver) = stream_events(action_receiver);
+    let (thread, receiver) =
+        stream_events_with_command("./tests/dummy-disk-activity.sh", vec![], action_receiver);
 
     let event = receiver.recv_timeout(Duration::from_secs(10)).unwrap();
     assert_ne!(event, None);

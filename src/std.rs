@@ -26,7 +26,9 @@ pub enum Action {
     Stop,
     Noop,
 }
-pub fn stream_events(
+pub fn stream_events_with_command(
+    command: &str,
+    args: Vec<&str>,
     action: Receiver<Action>,
 ) -> (
     thread::JoinHandle<Result<(), Error>>,
