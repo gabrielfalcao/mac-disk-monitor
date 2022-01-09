@@ -34,6 +34,7 @@ impl Event {
             event.set_path(&cap[5]);
             event.set_kind(&cap[7]);
             event.set_volume_name(&cap[9]);
+            event.set_time_string("20220108-20:22:05.1438");
         }
 
         event
@@ -72,8 +73,11 @@ impl Event {
     pub fn volume_name(&self) -> Option<String> {
         self.volume_name.clone()
     }
-    pub fn time_string(&self) -> Option<String> {
-        None
+    pub fn set_time_string(&mut self, time: &str) {
+        self.time = String::from(time);
+    }
+    pub fn time_string(&self) -> String {
+        self.time.clone()
     }
 }
 
@@ -99,8 +103,8 @@ mod tests {
             Some(String::from("Time Machine Backups"))
         );
         assert_equal!(
-            disk_appeared.time_string(),
-            Some(String::from("20220108-20:22:05.1438"))
+            disk_appeared.time_string().as_str(),
+            "20220108-20:22:05.1438"
         );
     }
 }
