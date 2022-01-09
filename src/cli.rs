@@ -18,6 +18,7 @@ fn main() {
             Ok(event) => {
                 println!("{:?}", event);
             }
+            Err(_) => {}
         }
     }
 }
