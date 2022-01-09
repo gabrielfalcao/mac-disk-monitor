@@ -34,23 +34,57 @@ pub fn stream_events_with_command(
     thread::JoinHandle<Result<(), Error>>,
     Receiver<Option<Event>>,
 ) {
+    let mut child = Command::new(command)
+        .args(args)
+        .stdin(Stdio::null())
+        .stderr(Stdio::piped())
+        .stdout(Stdio::piped())
+        .spawn()
+        .expect("failed to execute diskutil");
+
     let (sender, receiver) = channel();
 
+    // Spawn off an expensive computation
     let handle = thread::spawn(move || {
-        let event = Event::from_line("***DiskDescriptionChanged ('disk4', DAVolumePath = 'file:///Volumes/my%20backups/') Time=20220108-20:26:52.7814");
-        thread::sleep(Duration::from_secs(2));
-        sender.send(Some(event)).unwrap();
-        match action.recv_timeout(Duration::from_secs(1)) {
-            Ok(action) => {
-                sender.send(None).unwrap();
-                return Ok(());
+        let stdout = child
+            .stdout
+            .take()
+            .expect("child did not have a handle to stdout");
+
+        let mut stdout_reader = BufReader::new(stdout);
+
+        let stderr = child
+            .stderr
+            .take()
+            .expect("child did not have a handle to stderr");
+
+        let mut stderr_reader = BufReader::new(stderr);
+
+        loop {
+            match action.recv_timeout(Duration::from_millis(100)) {
+                Ok(action) => {
+                    if action == Action::Stop {
+                        break;
+                    }
+                }
+                Err(_err) => {}
             }
-            Err(_) => {
-                thread::sleep(Duration::from_secs(1));
+            let mut outbuf: Vec<u8> = Vec::new();
+            if let Ok(_bytes_read) = stdout_reader.read_until(b'\n', &mut outbuf) {
+                let line = String::from_utf8(outbuf).unwrap();
+                if line.starts_with("***Begin monitoring") {
+                    continue;
+                }
+                let event = Event::from_line(line.as_str());
+                sender.send(Some(event)).unwrap();
+            }
+            match child.try_wait() {
+                Ok(Some(_)) => break,
+                Ok(None) => continue,
+                Err(e) => panic!("failed to read output of diskutil activity: {}", e),
             }
         }
         sender.send(None).unwrap();
-
         Ok(())
     });
 

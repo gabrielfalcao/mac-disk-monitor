@@ -12,10 +12,17 @@ fn test_disk_activity() {
     let (thread, receiver) =
         stream_events_with_command("./tests/dummy-disk-activity.sh", vec![], action_receiver);
 
-    let event = receiver.recv_timeout(Duration::from_secs(10)).unwrap();
+    let event = receiver
+        .recv_timeout(Duration::from_secs(5))
+        .unwrap_or(None);
     assert_ne!(event, None);
     let event = event.unwrap();
-    assert_ne!(event.name(), "");
+    assert_equal!(event.name(), "DiskAppeared");
+    assert_equal!(
+        event.path().unwrap_or(String::new()),
+        "file:///Volumes/my%20backups/"
+    );
+
     action_sender.send(Action::Stop).unwrap();
     thread.join().unwrap().unwrap();
 }
