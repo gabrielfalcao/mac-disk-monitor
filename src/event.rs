@@ -1,6 +1,16 @@
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
+/// Structured data about a disk event.
+///
+/// Can be either created empty or directly parsed from a string.
+///
+/// # Example:
+///
+/// ```
+/// let event = Event::from_line("***DiskAppeared ('disk3s1', DAVolumePath = '<null>', DAVolumeKind = 'msdos', DAVolumeName = 'EFI') Time=20220108-20:22:05.1454");
+/// assert_eq!(event.name(), "DiskAppeared");
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Event {
     name: String,
@@ -13,6 +23,7 @@ pub struct Event {
 }
 
 impl Event {
+    /// Creates an empty Event
     pub fn empty() -> Event {
         Event {
             name: String::new(),
@@ -24,6 +35,7 @@ impl Event {
             comment: None,
         }
     }
+    /// Creates a new Event containing the parsed the disk information from the given line.
     pub fn from_line(line: &str) -> Event {
         let mut event = Event::empty();
         //\s*\(('(?P<bsd_name>[^']+)')?, DAVolumePath\s*=\s*(?P<path>'[^']+')\)
@@ -67,6 +79,7 @@ impl Event {
 
         event
     }
+    /// Serializes the Event to a yaml string
     pub fn to_yaml(&self) -> String
     where
         Self: Serialize,
@@ -76,6 +89,7 @@ impl Event {
             Err(e) => format!("{{\"error\": {:?}}}", e),
         }
     }
+    /// Serializes the Event to a json string
     pub fn to_json(&self) -> String
     where
         Self: Serialize,
@@ -86,25 +100,33 @@ impl Event {
         }
     }
 
+    /// The event name
     pub fn name(&self) -> String {
         self.name.clone()
     }
 
+    /// Sets the event name
     pub fn set_name(&mut self, name: &str) {
         self.name = String::from(name)
     }
+    /// Sets the bsd_name
     pub fn set_bsd_name(&mut self, bsd_name: &str) {
         self.bsd_name = Some(String::from(bsd_name));
     }
+    /// The disk name, if any
     pub fn bsd_name(&self) -> Option<String> {
         self.bsd_name.clone()
     }
+    /// Sets the event comment
     pub fn set_comment(&mut self, comment: &str) {
         self.comment = Some(String::from(comment));
     }
+    /// The event comment, if any
     pub fn comment(&self) -> Option<String> {
         self.comment.clone()
     }
+
+    /// Sets the volume path of the event
     pub fn set_path(&mut self, path: &str) {
         self.volume_path = if !path.eq("<null>") {
             Some(String::from(path))
@@ -112,9 +134,12 @@ impl Event {
             None
         };
     }
+    /// The volume path, if any
     pub fn path(&self) -> Option<String> {
         self.volume_path.clone()
     }
+
+    /// Sets the volume kind, if any
     pub fn set_kind(&mut self, kind: &str) {
         self.volume_kind = if !kind.eq("<null>") {
             Some(String::from(kind))
@@ -122,9 +147,11 @@ impl Event {
             None
         };
     }
+    /// The volume kind, if any
     pub fn kind(&self) -> Option<String> {
         self.volume_kind.clone()
     }
+    /// Sets the volume name
     pub fn set_volume_name(&mut self, name: &str) {
         self.volume_name = if !name.eq("<null>") {
             Some(String::from(name))
@@ -132,17 +159,24 @@ impl Event {
             None
         };
     }
+    /// The volume name, if any
     pub fn volume_name(&self) -> Option<String> {
         self.volume_name.clone()
     }
     pub fn set_time_string(&mut self, time: &str) {
         self.time = String::from(time);
     }
+    /// The time when the event happened as string
     pub fn time_string(&self) -> String {
         self.time.clone()
     }
 }
 
+/// Extracts most of the metadata about the event from a line:
+/// - event name,
+/// - bsd_name
+/// - comment
+/// - time
 pub fn extract_base_metadata(
     line: &str,
 ) -> Option<(String, Option<String>, Option<String>, String)> {
@@ -167,6 +201,7 @@ pub fn extract_base_metadata(
         None => None,
     }
 }
+/// Extracts the volume path from the given line.
 pub fn extract_volume_path(line: &str) -> Option<String> {
     let re = Regex::new(r"DAVolumePath\s*=\s*('([^']+)')").unwrap();
 
@@ -178,6 +213,7 @@ pub fn extract_volume_path(line: &str) -> Option<String> {
         None => None,
     }
 }
+/// Extracts the volume kind from the given line.
 pub fn extract_volume_kind(line: &str) -> Option<String> {
     let re = Regex::new(r"DAVolumeKind\s*=\s*('([^']+)')").unwrap();
 
@@ -189,6 +225,7 @@ pub fn extract_volume_kind(line: &str) -> Option<String> {
         None => None,
     }
 }
+/// Extracts the volume name from the given line.
 pub fn extract_volume_name(line: &str) -> Option<String> {
     let re = Regex::new(r"DAVolumeName\s*=\s*('([^']+)')").unwrap();
 
