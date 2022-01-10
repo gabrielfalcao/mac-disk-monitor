@@ -3,6 +3,14 @@ name = "mac-disk-monitor"
 version = "0.1.0"
 edition = "2021"
 authors = ["Gabriel Falcão <gabrielfalcao@protonmail.com>"]
+categories = ["os::macos-apis", "parser-implementations", "parsing", "command-line-utilities", "concurrency"]
+description = "Rust library and command-line tool to monitor disk activity on MacOS"
+keywords = ["macos", "diskutil"]
+license = "GPL-3.0"
+repository = "https://github.com/gabrielfalcao/mac-disk-monitor/"
+readme = "README.md"
+homepage = "https://github.com/gabrielfalcao/mac-disk-monitor/"
+documentation = "https://docs.rs/mac-disk-monitor"
 
 [dependencies]
 clap = { version = "2.33", features = ["wrap_help"] }
