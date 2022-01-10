@@ -24,6 +24,6 @@ path = "src/lib.rs"
 
 
 [[bin]]
-name = "mac-disk-monitor"
+name = "disk-events-json"
 path = "src/cli.rs"
 bench = false

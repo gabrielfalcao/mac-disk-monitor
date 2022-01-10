@@ -1,10 +1,11 @@
 extern crate clap;
-use clap::{App};
+use clap::App;
 
 use mac_disk_monitor::std::*;
-use std::sync::mpsc::{channel};
+use std::sync::mpsc::channel;
 use std::time::Duration;
 
+/// Command-line entrypoint to monitor the disk events and print them out to stdout as json.
 fn main() {
     let app = App::new("mac-disk-monitor");
     let _matches = app.get_matches();

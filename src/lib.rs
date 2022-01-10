@@ -37,7 +37,7 @@
 //! }
 //! ```
 
-#![warn(missing_docs)]
+//#![warn(missing_docs)]
 
 pub mod event;
 pub mod std;

@@ -1,3 +1,5 @@
+#![allow(rustdoc::bare_urls)]
+
 use crate::event::Event;
 use std::io::BufRead;
 use std::io::BufReader;
@@ -11,6 +13,7 @@ use timeout_readwrite::TimeoutReader;
 use std::sync::mpsc::{channel, Receiver};
 use std::thread;
 
+/// The error type for this crate
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("i/o error: {0}")]
@@ -21,11 +24,38 @@ pub enum Error {
     SendError(#[from] SendError<Option<Event>>),
 }
 
+/// The Action that can be sent to the thread to stop it
 #[derive(Debug, PartialEq, Eq)]
 pub enum Action {
     Stop,
     Noop,
 }
+
+/// Runs `diskutil activity` in a thread and parses its stdout in real
+/// time, emitting Option<Event> when necessary.
+///
+/// Parameters:
+/// > `action` - a [`Receiver`] where [`Action`] can be sent to the thread.
+/// [`Receiver`]: https://doc.rust-lang.org/std/sync/mpsc/struct.Receiver.html
+pub fn stream_events(
+    action: Receiver<Action>,
+) -> (
+    thread::JoinHandle<Result<(), Error>>,
+    Receiver<Option<Event>>,
+) {
+    stream_events_with_command("/usr/sbin/diskutil", vec!["activity"], action)
+}
+
+/// Runs the given command in a thread and attempts to parse event
+/// data from each new line of the subprocess's stdout.
+/// This is the underlying function that does all the heavy lifting for [`stream_events`].
+///
+/// Parameters:
+/// > `command` - the command to execute
+/// > `args` - the command-line args to pass to the command
+/// > `action` - a [`Receiver`] where [`Action`] can be sent to the thread.
+/// [`Receiver`]: https://doc.rust-lang.org/std/sync/mpsc/struct.Receiver.html
+/// [`stream_events`]: ./fn.stream_events.html
 pub fn stream_events_with_command(
     command: &str,
     args: Vec<&str>,
@@ -90,13 +120,4 @@ pub fn stream_events_with_command(
     });
 
     (handle, receiver)
-}
-
-pub fn stream_events(
-    action: Receiver<Action>,
-) -> (
-    thread::JoinHandle<Result<(), Error>>,
-    Receiver<Option<Event>>,
-) {
-    stream_events_with_command("/usr/sbin/diskutil", vec!["activity"], action)
 }
