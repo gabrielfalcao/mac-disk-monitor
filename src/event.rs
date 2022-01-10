@@ -7,9 +7,14 @@ use serde::{Deserialize, Serialize};
 ///
 /// # Example:
 ///
-/// ```no_run
+/// ```
+/// use mac_disk_monitor::Event;
+///
 /// let event = Event::from_line("***DiskAppeared ('disk3s1', DAVolumePath = '<null>', DAVolumeKind = 'msdos', DAVolumeName = 'EFI') Time=20220108-20:22:05.1454");
 /// assert_eq!(event.name(), "DiskAppeared");
+/// assert_eq!(event.bsd_name().unwrap(), "disk3s1");
+/// assert_eq!(event.kind().unwrap(), "msdos");
+/// assert_eq!(event.volume_name().unwrap(), "EFI");
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Event {
