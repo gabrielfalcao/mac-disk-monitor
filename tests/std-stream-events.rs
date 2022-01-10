@@ -26,3 +26,15 @@ fn test_disk_activity() {
     action_sender.send(Action::Stop).unwrap();
     thread.join().unwrap().unwrap();
 }
+
+#[test]
+fn test_timeout() {
+    let (action_sender, action_receiver) = channel();
+    let (thread, receiver) = stream_events_with_command("sleep", vec!["10"], action_receiver);
+
+    let event = receiver.recv_timeout(Duration::from_secs(1)).unwrap_err();
+    assert_equal!(event.to_string(), "timed out waiting on channel");
+
+    action_sender.send(Action::Stop).unwrap();
+    thread.join().unwrap().unwrap();
+}
