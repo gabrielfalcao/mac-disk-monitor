@@ -1,6 +1,6 @@
 [package]
 name = "mac-disk-monitor"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Gabriel Falcão <gabrielfalcao@protonmail.com>"]
 categories = ["os::macos-apis", "parser-implementations", "parsing", "command-line-utilities", "concurrency"]
@@ -25,6 +25,7 @@ timeout-readwrite = "0.3.1"
 chrono = {version = "0.4", features = ["serde"]}
 chrono-humanize = "0.2.1"
 
+ctrlc = "3.2.1"
 [dev-dependencies]
 speculate = "0.1"
 k9 = "0.11.1"

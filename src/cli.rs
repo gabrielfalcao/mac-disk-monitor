@@ -1,6 +1,7 @@
 extern crate clap;
 use clap::{App, Arg};
 
+use ctrlc;
 use mac_disk_monitor::std::*;
 use mac_disk_monitor::version;
 use std::sync::mpsc::channel;
@@ -53,6 +54,12 @@ fn main() {
 
     let (action, receiver) = channel();
     let (thread, receiver) = stream_events(receiver);
+    ctrlc::set_handler(move || {
+        action
+            .send(Action::Stop)
+            .expect("Could not send 'stop' action to thread.");
+    })
+    .expect("Error setting Ctrl-C handler");
 
     loop {
         match receiver.recv_timeout(Duration::from_millis(interval)) {
@@ -67,16 +74,22 @@ fn main() {
                     );
                 }
                 None => {
-                    action.send(Action::Stop).unwrap();
                     break;
                 }
             },
-            Err(e) => {
-                if !e.to_string().eq("timed out waiting on channel") {
-                    eprintln!("Error: {}", e);
+            Err(e) => match e.to_string().as_str() {
+                "timed out waiting on channel" => {}
+                "channel is empty and sending half is closed" => {
+                    break;
                 }
-            }
+                error => {
+                    eprintln!("Error: {}", error);
+                    break;
+                }
+            },
         }
     }
+    eprintln!("waiting for thread to stop...");
     thread.join().unwrap().unwrap();
+    eprintln!("done");
 }
