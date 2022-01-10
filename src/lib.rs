@@ -1,7 +1,8 @@
 //! Mac Disk Monitor
 //!
 //! This crate provides a way to monitor disk activity on MacOS in real time.
-//! Under the hood it simply calls `diskutil activity` in a thread and parses its output.
+//! Under the hood it simply calls `diskutil activity` in a thread and parses its output via [`Event::from_line()`]
+//!
 //!
 //! Example usage:
 //!
@@ -36,9 +37,7 @@
 //!     thread.join().unwrap().unwrap()
 //! }
 //! ```
-
-//#![warn(missing_docs)]
-
+/// [`Event::from_line()`]: ./struct.Event.html#method.from_line
 pub mod event;
 pub mod std;
 pub use crate::event::*;
