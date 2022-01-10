@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// # Example:
 ///
-/// ```
+/// ```no_run
 /// let event = Event::from_line("***DiskAppeared ('disk3s1', DAVolumePath = '<null>', DAVolumeKind = 'msdos', DAVolumeName = 'EFI') Time=20220108-20:22:05.1454");
 /// assert_eq!(event.name(), "DiskAppeared");
 /// ```

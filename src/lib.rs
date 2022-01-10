@@ -5,7 +5,7 @@
 //!
 //! Example usage:
 //!
-//! ```
+//! ```no_run
 //! use mac_disk_monitor::{stream_events, Action};
 //! use std::sync::mpsc::channel;
 //! use std::time::Duration;
