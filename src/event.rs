@@ -1,5 +1,8 @@
+use chrono::{Local, NaiveDateTime};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
+
+const APPLE_FORMAT: &'static str = "%Y%m%d-%H:%M:%S.%f";
 
 /// Structured data about a disk event.
 ///
@@ -10,7 +13,7 @@ use serde::{Deserialize, Serialize};
 /// ```
 /// use mac_disk_monitor::Event;
 ///
-/// let event = Event::from_line("***DiskAppeared ('disk3s1', DAVolumePath = '<null>', DAVolumeKind = 'msdos', DAVolumeName = 'EFI') Time=20220108-20:22:05.1454");
+/// let event = Event::from_line("***DiskAppeared ('disk3s1', DAVolumePath = '<null>', DAVolumeKind = 'msdos', DAVolumeName = 'EFI') Time=20220108-20:22:05.000001454");
 /// assert_eq!(event.name(), "DiskAppeared");
 /// assert_eq!(event.bsd_name().unwrap(), "disk3s1");
 /// assert_eq!(event.kind().unwrap(), "msdos");
@@ -19,7 +22,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Event {
     name: String,
-    time: String,
+    time: NaiveDateTime,
     bsd_name: Option<String>,
     volume_path: Option<String>,
     volume_kind: Option<String>,
@@ -32,7 +35,7 @@ impl Event {
     pub fn empty() -> Event {
         Event {
             name: String::new(),
-            time: String::new(),
+            time: Local::now().naive_local(),
             bsd_name: None,
             volume_path: None,
             volume_kind: None,
@@ -169,11 +172,18 @@ impl Event {
         self.volume_name.clone()
     }
     pub fn set_time_string(&mut self, time: &str) {
-        self.time = String::from(time);
+        match NaiveDateTime::parse_from_str(time, APPLE_FORMAT) {
+            Ok(time) => {
+                self.time = time;
+            }
+            Err(e) => {
+                panic!("Warning: {}", e);
+            }
+        }
     }
     /// The time when the event happened as string
     pub fn time_string(&self) -> String {
-        self.time.clone()
+        self.time.format(APPLE_FORMAT).to_string()
     }
 }
 
@@ -249,7 +259,7 @@ mod tests {
 
     #[test]
     fn test_parse_disk_appeared_with_volume_path() {
-        let line = String::from("***DiskAppeared ('disk4', DAVolumePath = 'file:///Volumes/my%20backups/', DAVolumeKind = 'hfs', DAVolumeName = 'Time Machine Backups') Time=20220108-20:22:05.1438");
+        let line = String::from("***DiskAppeared ('disk4', DAVolumePath = 'file:///Volumes/my%20backups/', DAVolumeKind = 'hfs', DAVolumeName = 'Time Machine Backups') Time=20220108-20:22:05.000001438");
         let disk_appeared = Event::from_line(line.as_str());
 
         assert_equal!(disk_appeared.name().as_str(), "DiskAppeared");
@@ -265,12 +275,12 @@ mod tests {
         );
         assert_equal!(
             disk_appeared.time_string().as_str(),
-            "20220108-20:22:05.1438"
+            "20220108-20:22:05.000001438"
         );
     }
     #[test]
     fn test_parse_disk_appeared_without_volume_path_kind_and_name() {
-        let line = String::from("***DiskAppeared ('disk3s2', DAVolumePath = '<null>', DAVolumeKind = '<null>', DAVolumeName = '<null>') Time=20220108-20:22:05.1453");
+        let line = String::from("***DiskAppeared ('disk3s2', DAVolumePath = '<null>', DAVolumeKind = '<null>', DAVolumeName = '<null>') Time=20220108-20:22:05.000001453");
         let disk_appeared = Event::from_line(line.as_str());
 
         assert_equal!(disk_appeared.name().as_str(), "DiskAppeared");
@@ -280,12 +290,12 @@ mod tests {
         assert_equal!(disk_appeared.volume_name(), None);
         assert_equal!(
             disk_appeared.time_string().as_str(),
-            "20220108-20:22:05.1453"
+            "20220108-20:22:05.000001453"
         );
     }
     #[test]
     fn test_parse_disk_appeared_without_bsd_name() {
-        let line = String::from("***DiskAppeared ((no BSD name), DAVolumePath = 'file:///System/Volumes/Data/home/', DAVolumeKind = 'autofs', DAVolumeName = '<null>') Time=20220108-20:22:05.1457");
+        let line = String::from("***DiskAppeared ((no BSD name), DAVolumePath = 'file:///System/Volumes/Data/home/', DAVolumeKind = 'autofs', DAVolumeName = '<null>') Time=20220108-20:22:05.000001457");
         let disk_appeared = Event::from_line(line.as_str());
 
         assert_equal!(disk_appeared.name().as_str(), "DiskAppeared");
@@ -298,12 +308,12 @@ mod tests {
         assert_equal!(disk_appeared.volume_name(), None);
         assert_equal!(
             disk_appeared.time_string().as_str(),
-            "20220108-20:22:05.1457"
+            "20220108-20:22:05.000001457"
         );
     }
     #[test]
     fn test_parse_disk_disappeared() {
-        let line = String::from("***DiskDisappeared ('disk3s1', DAVolumePath = '<null>', DAVolumeKind = 'msdos', DAVolumeName = 'EFI') Time=20220108-20:22:29.6773");
+        let line = String::from("***DiskDisappeared ('disk3s1', DAVolumePath = '<null>', DAVolumeKind = 'msdos', DAVolumeName = 'EFI') Time=20220108-20:22:29.000006773");
         let event = Event::from_line(line.as_str());
 
         assert_equal!(event.name().as_str(), "DiskDisappeared");
@@ -311,11 +321,11 @@ mod tests {
         assert_equal!(event.path(), None);
         assert_equal!(event.kind(), Some(String::from("msdos")));
         assert_equal!(event.volume_name(), Some(String::from("EFI")));
-        assert_equal!(event.time_string().as_str(), "20220108-20:22:29.6773");
+        assert_equal!(event.time_string().as_str(), "20220108-20:22:29.000006773");
     }
     #[test]
     fn test_parse_disk_mount_approval() {
-        let line = String::from("***DiskMountApproval ('disk3s1', DAVolumePath = '<null>', DAVolumeKind = 'msdos', DAVolumeName = 'EFI') Comment=Approving Time=20220108-20:22:35.8686");
+        let line = String::from("***DiskMountApproval ('disk3s1', DAVolumePath = '<null>', DAVolumeKind = 'msdos', DAVolumeName = 'EFI') Comment=Approving Time=20220108-20:22:35.000008686");
         let event = Event::from_line(line.as_str());
 
         assert_equal!(event.name().as_str(), "DiskMountApproval");
@@ -324,24 +334,24 @@ mod tests {
         assert_equal!(event.kind(), Some(String::from("msdos")));
         assert_equal!(event.volume_name(), Some(String::from("EFI")));
         assert_equal!(event.comment(), Some(String::from("Approving")));
-        assert_equal!(event.time_string().as_str(), "20220108-20:22:35.8686");
+        assert_equal!(event.time_string().as_str(), "20220108-20:22:35.000008686");
     }
     #[test]
     fn test_parse_disk_peek() {
-        let line = String::from("***DiskPeek ('disk3s1') Time=20220108-20:22:35.8607");
+        let line = String::from("***DiskPeek ('disk3s1') Time=20220108-20:22:35.000008607");
         let event = Event::from_line(line.as_str());
 
         assert_equal!(event.name().as_str(), "DiskPeek");
         assert_equal!(event.bsd_name(), Some(String::from("disk3s1")));
-        assert_equal!(event.time_string().as_str(), "20220108-20:22:35.8607");
+        assert_equal!(event.time_string().as_str(), "20220108-20:22:35.000008607");
     }
     #[test]
     fn test_parse_disk_activity_idle() {
-        let line = String::from("***DAIdle (no DADiskRef) Time=20220108-20:22:29.6774");
+        let line = String::from("***DAIdle (no DADiskRef) Time=20220108-20:22:29.000006774");
         let event = Event::from_line(line.as_str());
 
         assert_equal!(event.name().as_str(), "DAIdle");
         assert_equal!(event.bsd_name(), Some(String::from("no DADiskRef")));
-        assert_equal!(event.time_string().as_str(), "20220108-20:22:29.6774");
+        assert_equal!(event.time_string().as_str(), "20220108-20:22:29.000006774");
     }
 }
