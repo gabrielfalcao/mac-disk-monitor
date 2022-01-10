@@ -37,6 +37,7 @@ pub enum Action {
 /// Parameters:
 /// > `action` - a [`Receiver`] where [`Action`] can be sent to the thread.
 /// [`Receiver`]: https://doc.rust-lang.org/std/sync/mpsc/struct.Receiver.html
+#[cfg(not(tarpaulin_include))] // TODO find a way to write a test for this
 pub fn stream_events(
     action: Receiver<Action>,
 ) -> (
