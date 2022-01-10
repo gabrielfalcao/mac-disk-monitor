@@ -42,3 +42,9 @@ pub mod event;
 pub mod std;
 pub use crate::event::*;
 pub use crate::std::*;
+
+/// The version of the crate
+pub fn version() -> String {
+    let version = env!("CARGO_PKG_VERSION");
+    String::from(version)
+}
