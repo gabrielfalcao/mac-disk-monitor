@@ -354,4 +354,45 @@ mod tests {
         assert_equal!(event.bsd_name(), Some(String::from("no DADiskRef")));
         assert_equal!(event.time_string().as_str(), "20220108-20:22:29.000006774");
     }
+
+    #[test]
+    fn test_event_to_yaml() {
+        let mut event = Event::empty();
+        event.set_name("EventName");
+        event.set_bsd_name("disk1337");
+        event.set_volume_name("LeetDisk");
+        event.set_path("file:///foo/bar");
+        event.set_kind("stub");
+        event.set_comment("dummy");
+        event.set_time_string("20130307-13:37:42.1337");
+
+        assert_equal!(
+            event.to_yaml(),
+            r#"---
+name: EventName
+time: "2013-03-07T13:37:42.000001337"
+bsd_name: disk1337
+volume_path: "file:///foo/bar"
+volume_kind: stub
+volume_name: LeetDisk
+comment: dummy
+"#
+        );
+    }
+    #[test]
+    fn test_event_to_json() {
+        let mut event = Event::empty();
+        event.set_name("EventName");
+        event.set_bsd_name("disk1337");
+        event.set_volume_name("LeetDisk");
+        event.set_path("file:///foo/bar");
+        event.set_kind("stub");
+        event.set_comment("dummy");
+        event.set_time_string("20130307-13:37:42.1337");
+
+        assert_equal!(
+            event.to_json(),
+            r#"{"name":"EventName","time":"2013-03-07T13:37:42.000001337","bsd_name":"disk1337","volume_path":"file:///foo/bar","volume_kind":"stub","volume_name":"LeetDisk","comment":"dummy"}"#
+        );
+    }
 }
