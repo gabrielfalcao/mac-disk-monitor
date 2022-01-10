@@ -254,7 +254,7 @@ pub fn extract_volume_name(line: &str) -> Option<String> {
 }
 #[cfg(test)]
 mod tests {
-    use super::Event;
+    use super::{extract_base_metadata, Event};
     use k9::assert_equal;
 
     #[test]
@@ -394,5 +394,10 @@ comment: dummy
             event.to_json(),
             r#"{"name":"EventName","time":"2013-03-07T13:37:42.000001337","bsd_name":"disk1337","volume_path":"file:///foo/bar","volume_kind":"stub","volume_name":"LeetDisk","comment":"dummy"}"#
         );
+    }
+    #[test]
+    fn test_extract_base_metadata_invalid() {
+        let parsed = extract_base_metadata("invalid event log");
+        assert_equal!(parsed, None);
     }
 }
