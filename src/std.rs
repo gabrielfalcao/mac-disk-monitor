@@ -111,7 +111,6 @@ pub fn stream_events_with_command(
                 }
             }
         }
-        sender.send(None).unwrap();
         Ok(())
     });
 
