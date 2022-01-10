@@ -97,21 +97,16 @@ pub fn stream_events_with_command(
             }
             match child.try_wait() {
                 Ok(Some(_)) => break,
-                Ok(None) => {
-                    match action.recv_timeout(Duration::from_millis(100)) {
-                        Ok(action) => match action {
-                            Action::Stop => {
-                                return child.kill().map_err(|e| Error::from(e));
-                            }
-                            Action::Noop => continue,
-                        },
-                        Err(_e) => {
-                            //sender.send(None).unwrap_or(());
+                Ok(None) => match action.recv_timeout(Duration::from_millis(100)) {
+                    Ok(action) => match action {
+                        Action::Stop => {
+                            return child.kill().map_err(|e| Error::from(e));
                         }
-                    }
-                }
-                Err(e) => {
-                    eprintln!("failed to read output of diskutil activity: {}", e);
+                        Action::Noop => continue,
+                    },
+                    Err(_) => {}
+                },
+                Err(_) => {
                     break;
                 }
             }
