@@ -2,6 +2,7 @@ use mac_disk_monitor::{stream_events, Action};
 use std::sync::mpsc::channel;
 use std::time::Duration;
 
+#[cfg(not(tarpaulin_include))]
 fn main() {
     let (action, receiver) = channel();
     let (thread, receiver) = stream_events(receiver);

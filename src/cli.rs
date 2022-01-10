@@ -6,6 +6,7 @@ use std::sync::mpsc::channel;
 use std::time::Duration;
 
 /// Command-line entrypoint to monitor the disk events and print them out to stdout as json.
+#[cfg(not(tarpaulin_include))]
 fn main() {
     let app = App::new("mac-disk-monitor");
     let _matches = app.get_matches();
